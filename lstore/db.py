@@ -80,10 +80,9 @@ class Database:
         table_directory_file.close()
 
         # Thread cleanup
-        # TODO need to have a way to see if all transactions that have been submitted have completed, sleep is temporary
-        time.sleep(5)
-        print(f'KILLING THREADS')
+        self.let_execution_threads_complete()
         self.batcher.kill_threads()
+        print(f'THREADS KILLED')
 
         # go through every table and save the page directories
         for table_info in self.table_directory.values():
@@ -91,6 +90,7 @@ class Database:
             table = self.tables[table_name]
             table.record_lock = None
             table.db_batcher = None
+            table.bufferpool.data_lock = None
             did_close = table.close_table_page_directory()
 
             if not did_close:
@@ -105,6 +105,7 @@ class Database:
         # Write all dirty values back to disk
         self.bufferpool.commit_all_frames()
 
+        print(f'DB CLOSING')
         return True
 
     def create_table(self, name: str, num_columns: int, key: int) -> Table:
@@ -163,3 +164,8 @@ class Database:
         """
         print(f'tables = {self.tables}')
         return self.tables[name]
+
+    def let_execution_threads_complete(self):
+        # Thread cleanup
+        while self.batcher.xacts_queued != self.batcher.xacts_completed:
+            time.sleep(.5)

@@ -1,5 +1,7 @@
 from lstore.config import * 
 from lstore.page import *
+
+import threading
 from datetime import datetime
 
 class Bufferpool:
@@ -10,14 +12,17 @@ class Bufferpool:
         self.frame_count = 0
         self.path_to_root = path_to_root
         self.merge_buffer = False
+        self.data_lock = threading.Lock()
 
     def _add_frame_to_directory(self, table_name, page_range, base_page, is_base_record, frame_index):
+        self.data_lock.acquire()
         new_frame_key = (table_name, page_range, base_page, is_base_record)
         self.frame_directory[new_frame_key] = frame_index
         self.frames[frame_index].tuple_key = new_frame_key
         
         if self.frame_count < BUFFERPOOL_FRAME_COUNT or self.merge_buffer:
             self.frame_count += 1
+        self.data_lock.release()
 
     def at_capacity(self):
         if self.frame_count == BUFFERPOOL_FRAME_COUNT:
@@ -107,6 +112,7 @@ class Bufferpool:
         """
         Function that loads a page into the Bufferpool
         """
+
         # Check whether this is a base record or a tail record
         if is_base_record:
             path_to_page = f"{self.path_to_root}/{table_name}/page_range_{page_range_index}/" \
@@ -119,6 +125,7 @@ class Bufferpool:
 
         # need to evict a page because the bufferpool is at capacity
         if self.at_capacity() and not self.merge_buffer:
+            print(f'********  FRAME COUNT = {self.frame_count}')
             frame_index = self.evict_page()
             self.frames[frame_index] = Frame(path_to_page_on_disk=path_to_page, table_name=table_name)
         else:

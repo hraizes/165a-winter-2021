@@ -338,12 +338,12 @@ class Table:
         Function that creates a new RID, increments the amount of records in the table,
         then creates a RID dict that is mapped in the Table page_directory.
         """
-        # TODO acquire lock
+        self.record_lock.acquire()
         rid = self.num_records
         self.num_records += 1
         self.page_directory[rid] = self.__new_base_rid_dict()
         self.num_base_records += 1
-        # TODO release lock
+        self.record_lock.release()
         return rid
 
     def __new_base_rid_dict(self) -> dict:
@@ -378,9 +378,12 @@ class Table:
         Function that creates a new TID, increments the amount of records in the Base_page,
         then creates a TID dict that is mapped in the BP tail_page_directory.
         """
+
+
         rid = self.num_records
         self.num_records += 1
         self.page_directory[rid] = self.__new_tail_rid_dict(page_range_index=page_range_index)
+
 
         return rid
 
@@ -400,7 +403,7 @@ class Table:
         if tail_page_index > self.page_range_data[page_range_index]["tail_page_count"] - 1:
             self._allocate_new_tail_page(page_range_index, self.page_range_data[page_range_index]["tail_page_count"])
         
-        # TODO Do you need this Jim?
+        # TODO Do you need this Jim? NO WE DON'T HALEY
         self.page_ranges[page_range_index].num_tail_records += 1
         self.page_range_data[page_range_index]["num_tail_records"] += 1
         self.num_tail_records += 1
@@ -431,7 +434,7 @@ class Table:
         This function takes a newly created rid and a Record and finds the appropriate base page to insert it to and
         updates the rid value in the page_directory appropriately
         """
-
+        self.record_lock.acquire()
         record_info = self.page_directory.get(rid)
         pr = record_info.get('page_range')
         bp = record_info.get('base_page')
@@ -459,7 +462,7 @@ class Table:
 
         # Stop working with BasePage Frame
         self.bufferpool.frames[frame_index].unpin_frame()
-        
+        self.record_lock.release()
         return True
 
     def update_record(self, updated_record: Record, rid: int) -> bool:
@@ -467,6 +470,7 @@ class Table:
         This function takes a Record and a RID and finds the appropriate place to write the record and writes it
         """
 
+        self.record_lock.acquire()
         rid_info = self.page_directory.get(rid)
         pr = rid_info.get('page_range')
         bp = rid_info.get('base_page')
@@ -533,6 +537,8 @@ class Table:
         self.bufferpool.frames[base_page_frame_index].unpin_frame()
 
         self.page_range_data[pr]['num_updates'] += 1
+
+        self.record_lock.release()
 
         return True
 
