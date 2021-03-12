@@ -22,6 +22,8 @@ class IndividualIndex:
 
         table.bufferpool.commit_all_frames()
 
+        table.bufferpool.commit_all_frames()
+
         last_rid = table.num_base_records - 1
 
         last_page_range = math.floor(last_rid / ENTRIES_PER_PAGE_RANGE)
@@ -111,6 +113,7 @@ class IndividualIndex:
         #self.lock.acquire()
         self.index[value].remove(deleted_rid)
         #self.lock.release()
+
 
 
 class Index:

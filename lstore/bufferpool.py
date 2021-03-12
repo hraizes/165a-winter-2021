@@ -160,7 +160,6 @@ class Bufferpool:
         for i in range(num_columns + META_COLUMN_COUNT):
             frame_to_reload.all_columns[i].read_from_disk(path_to_page=path_to_page, column=i)
 
-
     def commit_page(self, frame_index):
         frame_to_commit = self.frames[frame_index]
         all_columns = frame_to_commit.all_columns
