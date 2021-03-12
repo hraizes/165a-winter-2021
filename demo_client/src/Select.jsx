@@ -2,16 +2,22 @@ import styled from 'styled-components';
 import React, { useState } from 'react';
 
 function Select(props) {
+  const [key,setKey] = useState(0);
+  const [value,setValue] = useState(0);
   return (
       <SelectDisplay>
-        <label>key: </label>
-        <input></input>
+        <label>column: </label>
+        <input onChange={(evt)=>{setKey(evt.target.value)}} value={key} ></input>
         <br/>
         <label>value: </label>
-        <input></input>
+        <input onChange={(evt)=>{setValue(evt.target.value)}} value={value}></input>
         <br/>
-        <SubmitButton>
-         select
+        <SubmitButton  onClick={()=>{props.appendTX({
+          type:'select',
+          key,
+          value
+        })}}>
+         add to transaction
         </SubmitButton>
       </SelectDisplay>
   );

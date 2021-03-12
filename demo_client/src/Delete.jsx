@@ -2,13 +2,17 @@ import styled from 'styled-components';
 import React, { useState } from 'react';
 
 function Delete(props) {
+  const [key,setKey] = useState(0);
   return (
       <DeleteDisplay>
         <label>primary key: </label>
-        <input></input>
+        <input onChange={(evt)=>{setKey(evt.target.value)}} value={key}></input>
         <br/>
-        <SubmitButton>
-          delete
+        <SubmitButton  onClick={()=>{props.appendTX({
+          type:'delete',
+          key
+        })}}>
+        add to transaction
         </SubmitButton>
       </DeleteDisplay>
   );

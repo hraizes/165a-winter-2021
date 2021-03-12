@@ -2,24 +2,40 @@ import styled from 'styled-components';
 import React, { useState } from 'react';
 
 function Insert(props) {
+  const [col1,setcol1] = useState(null);
+  const [col2,setcol2] = useState(null);
+  const [col3,setcol3] = useState(null);
+  const [col4,setcol4] = useState(null);
+  const [col5,setcol5] = useState(null);
   return (
       <InsertDisplay>
-        <label>col1: </label>
-        <InsertInput></InsertInput>
+        <label>col1(primary): </label>
+        <InsertInput onChange={(evt)=>{setcol1(evt.target.value)}} value={col1} ></InsertInput>
         <label> col2: </label>
-        <InsertInput></InsertInput>
+        <InsertInput  onChange={(evt)=>{setcol2(evt.target.value)}} value={col2} ></InsertInput>
         <label> col3: </label>
-        <InsertInput></InsertInput>
+        <InsertInput  onChange={(evt)=>{setcol3(evt.target.value)}} value={col3} ></InsertInput>
+        <label> col4: </label>
+        <InsertInput  onChange={(evt)=>{setcol4(evt.target.value)}} value={col4} ></InsertInput>
+        <label> col5: </label>
+        <InsertInput  onChange={(evt)=>{setcol5(evt.target.value)}} value={col5} ></InsertInput>
         <br/>
-        <SubmitButton>
-          insert
+        <SubmitButton onClick={()=>{props.appendTX({
+          type:'insert',
+          col1,
+          col2,
+          col3,
+          col4,
+          col5
+        })}}>
+        add to transaction
         </SubmitButton>
       </InsertDisplay>
   );
 }
 
 const InsertInput = styled.input`
-width:50px;
+width:20px;
 `;
 
 const InsertDisplay = styled.div`
