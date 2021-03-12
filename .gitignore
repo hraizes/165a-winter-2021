@@ -3,3 +3,7 @@ template/__pycache__
 .DS_STORE
 /demo_client/node_modules/*
 
+/flask/lib
+/flask/bin
+/flask/.Python
+/flask/pyvenv.cfg
